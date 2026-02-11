@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💧 AquaTrack - Water Consumption Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="water-drop">
+                <div class="drop"></div>
+                <div class="drop"></div>
+                <div class="drop"></div>
+            </div>
+            <h1>💧 AquaTrack</h1>
+            <p>Making every drop count...</p>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="app-container" id="appContainer">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-tint"></i>
+                    <h1>AquaTrack</h1>
+                </div>
+                <div class="header-info">
+                    <div class="date" id="currentDate"></div>
+                    <button class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="navigation">
+            <button class="nav-btn active" data-page="dashboard">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </button>
+            <button class="nav-btn" data-page="add-water">
+                <i class="fas fa-plus-circle"></i>
+                <span>Add Water</span>
+            </button>
+            <button class="nav-btn" data-page="analytics">
+                <i class="fas fa-chart-line"></i>
+                <span>Analytics</span>
+            </button>
+            <button class="nav-btn" data-page="settings">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </button>
+        </nav>
+
+        <!-- Dashboard Page -->
+        <main class="main-content">
+            <section id="dashboard" class="page active">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #0ea5e9, #0284c7);">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="todayTotal">0 ml</h3>
+                            <p>Today's Consumption</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="dailyGoal">2000 ml</h3>
+                            <p>Daily Goal</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="progressPercent">0%</h3>
+                            <p>Progress</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Section -->
+                <div class="progress-section">
+                    <h2><i class="fas fa-chart-bar"></i> Today's Progress</h2>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progressBar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-labels">
+                            <span>0 ml</span>
+                            <span id="currentAmount">0 ml</span>
+                            <span id="goalAmount">2000 ml</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <h2><i class="fas fa-bolt"></i> Quick Add</h2>
+                    <div class="quick-buttons">
+                        <button class="quick-btn" data-amount="250">
+                            <i class="fas fa-glass-water"></i>
+                            <span>250 ml</span>
+                            <small>Small Glass</small>
+                        </button>
+                        <button class="quick-btn" data-amount="500">
+                            <i class="fas fa-wine-bottle"></i>
+                            <span>500 ml</span>
+                            <small>Bottle</small>
+                        </button>
+                        <button class="quick-btn" data-amount="750">
+                            <i class="fas fa-beer-mug-empty"></i>
+                            <span>750 ml</span>
+                            <small>Large Bottle</small>
+                        </button>
+                        <button class="quick-btn" data-amount="1000">
+                            <i class="fas fa-wine-glass"></i>
+                            <span>1000 ml</span>
+                            <small>Liter</small>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-section">
+                    <div class="chart-container">
+                        <h3><i class="fas fa-chart-pie"></i> Today's Breakdown</h3>
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3><i class="fas fa-chart-line"></i> Weekly Trend</h3>
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Entries -->
+                <div class="recent-entries">
+                    <h2><i class="fas fa-history"></i> Recent Activity</h2>
+                    <div class="entries-list" id="entriesList">
+                        <div class="empty-state">
+                            <i class="fas fa-tint"></i>
+                            <p>No entries yet. Add your first water entry!</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Add Water Page -->
+            <section id="add-water" class="page">
+                <div class="add-water-container">
+                    <h2><i class="fas fa-plus-circle"></i> Add Water Entry</h2>
+                    
+                    <!-- Amount Selector -->
+                    <div class="input-group">
+                        <label for="amountInput">
+                            <i class="fas fa-ruler-vertical"></i> Amount (ml)
+                        </label>
+                        <div class="amount-input">
+                            <input type="range" id="amountSlider" min="50" max="2000" value="500" step="50">
+                            <div class="slider-labels">
+                                <span>50 ml</span>
+                                <span id="amountDisplay">500 ml</span>
+                                <span>2000 ml</span>
+                            </div>
+                        </div>
+                        
+                        <div class="preset-buttons">
+                            <button class="preset-btn" data-amount="250">250 ml</button>
+                            <button class="preset-btn" data-amount="500">500 ml</button>
+                            <button class="preset-btn" data-amount="750">750 ml</button>
+                            <button class="preset-btn" data-amount="1000">1000 ml</button>
+                        </div>
+                    </div>
+
+                    <!-- Purpose Selection -->
+                    <div class="input-group">
+                        <label for="purposeSelect">
+                            <i class="fas fa-tag"></i> Purpose
+                        </label>
+                        <select id="purposeSelect">
+                            <option value="drinking">💧 Drinking</option>
+                            <option value="cooking">👨‍🍳 Cooking</option>
+                            <option value="bathing">🚿 Bathing</option>
+                            <option value="washing">🍽️ Washing</option>
+                            <option value="gardening">🌿 Gardening</option>
+                            <option value="other">🔧 Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Time Selection -->
+                    <div class="input-group">
+                        <label for="timeInput">
+                            <i class="fas fa-clock"></i> Time
+                        </label>
+                        <input type="time" id="timeInput" value="">
+                        <button type="button" class="btn-now" onclick="setCurrentTime()">
+                            <i class="fas fa-history"></i> Set to Now
+                        </button>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="input-group">
+                        <label for="notesInput">
+                            <i class="fas fa-sticky-note"></i> Notes (Optional)
+                        </label>
+                        <textarea id="notesInput" placeholder="Add any notes about this entry..."></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button class="btn-primary btn-add-water" onclick="addWaterEntry()">
+                        <i class="fas fa-plus"></i> Add Water Entry
+                    </button>
+
+                    <!-- Preview -->
+                    <div class="preview-card">
+                        <h3><i class="fas fa-eye"></i> Preview</h3>
+                        <div class="preview-content">
+                            <div class="preview-item">
+                                <span>Amount:</span>
+                                <strong id="previewAmount">500 ml</strong>
+                            </div>
+                            <div class="preview-item">
+                                <span>Purpose:</span>
+                                <strong id="previewPurpose">Drinking</strong>
+                            </div>
+                            <div class="preview-item">
+                                <span>Time:</span>
+                                <strong id="previewTime">Current Time</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Page -->
+            <section id="analytics" class="page">
+                <div class="analytics-container">
+                    <h2><i class="fas fa-chart-line"></i> Analytics</h2>
+                    
+                    <div class="analytics-controls">
+                        <select id="periodSelect">
+                            <option value="7">Last 7 Days</option>
+                            <option value="30">Last 30 Days</option>
+                            <option value="90">Last 90 Days</option>
+                        </select>
+                    </div>
+
+                    <div class="analytics-stats">
+                        <div class="analytic-card">
+                            <h3>Average Daily</h3>
+                            <p class="stat-value" id="avgDaily">0 ml</p>
+                        </div>
+                        <div class="analytic-card">
+                            <h3>Total Tracked</h3>
+                            <p class="stat-value" id="totalTracked">0 L</p>
+                        </div>
+                        <div class="analytic-card">
+                            <h3>Goal Days</h3>
+                            <p class="stat-value" id="goalDays">0</p>
+                        </div>
+                        <div class="analytic-card">
+                            <h3>Water Saved</h3>
+                            <p class="stat-value" id="waterSaved">0 L</p>
+                        </div>
+                    </div>
+
+                    <div class="analytics-charts">
+                        <div class="chart-container">
+                            <h3>Consumption Trend</h3>
+                            <canvas id="analyticsChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h3>Usage Distribution</h3>
+                            <canvas id="distributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Page -->
+            <section id="settings" class="page">
+                <div class="settings-container">
+                    <h2><i class="fas fa-cog"></i> Settings</h2>
+                    
+                    <div class="setting-group">
+                        <h3><i class="fas fa-bullseye"></i> Goals</h3>
+                        <div class="setting-item">
+                            <label for="dailyGoalInput">Daily Water Goal (ml)</label>
+                            <input type="number" id="dailyGoalInput" min="500" max="10000" value="2000">
+                            <button class="btn-save" onclick="saveDailyGoal()">
+                                <i class="fas fa-save"></i> Save
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <h3><i class="fas fa-bell"></i> Notifications</h3>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="notificationsToggle" checked>
+                                Enable Daily Reminders
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label for="reminderTime">Reminder Time</label>
+                            <input type="time" id="reminderTime" value="09:00">
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <h3><i class="fas fa-palette"></i> Appearance</h3>
+                        <div class="theme-buttons">
+                            <button class="theme-btn active" data-theme="light">
+                                <i class="fas fa-sun"></i> Light
+                            </button>
+                            <button class="theme-btn" data-theme="dark">
+                                <i class="fas fa-moon"></i> Dark
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <h3><i class="fas fa-database"></i> Data Management</h3>
+                        <div class="data-actions">
+                            <button class="btn-secondary" onclick="exportData()">
+                                <i class="fas fa-download"></i> Export Data
+                            </button>
+                            <button class="btn-secondary" onclick="importData()">
+                                <i class="fas fa-upload"></i> Import Data
+                            </button>
+                            <button class="btn-danger" onclick="clearData()">
+                                <i class="fas fa-trash"></i> Clear All Data
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="app-info">
+                        <h3><i class="fas fa-info-circle"></i> About</h3>
+                        <p><strong>AquaTrack Water Tracker</strong></p>
+                        <p>Version 1.0.0</p>
+                        <p>Track, analyze, and reduce your daily water consumption.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Notification Area -->
+        <div id="notificationArea" class="notification-area"></div>
+
+        <!-- Floating Add Button -->
+        <button class="floating-btn" id="floatingAddBtn">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
